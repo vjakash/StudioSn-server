@@ -44,13 +44,35 @@ let mailOptions = {
 
 router.post('/', async(req, res) => {
     let data = req.body;
-    // console.log(data);
+    // console.log(data.specialReq);
 
     mailOptions.subject = `Quotation Request-${data['firstName']} ${data['lastName']}`;
     let specialReq = "";
-    data.specialReq.forEach(item => {
-        specialReq += `<li>${item}</li>`;
-    })
+
+    if (data.specialReq.length > 0) {
+        let tempLi = "";
+        data.specialReq.forEach(item => {
+            tempLi += `<li>${item}</li>`;
+        });
+        specialReq = `<h3 style="color:#3E2093">Special Requirements</h3>
+        <ul>
+          ${tempLi}
+          </ul>`;
+    }
+    let message = "";
+    if (data.message !== "") {
+        message = `<h3 style="color:#3E2093">Message</h3>
+        <p >
+        ${data['message']}
+        </p>`
+    }
+    let extraSessions = "";
+    if (data.extraSession !== "") {
+        extraSessions = `<h3 style="color:#3E2093">Extra Session</h3>
+        <p >
+        ${data['extraSession']}
+        </p>`
+    }
     mailOptions.html = `
     <html>
     <head>
@@ -80,29 +102,37 @@ router.post('/', async(req, res) => {
         </span>
         </p>
       <p>
-            Type of wedding: &nbsp; 
+            Type of Event: &nbsp; 
         <span style="font-size:1.2em;color:#3E2093;"> ${data['typeOfWedding']}</span>
         </p>
       <p>
             Venue: &nbsp; 
         <span style="font-size:1.2em;color:#3E2093;"> ${data['venue']}</span>
         </p>
-      <p>
-            Event Date: &nbsp; 
-        <span style="font-size:1.2em;color:#3E2093;">${new Date(data['date']).toDateString()}</span>
+        <p>
+            Expected no of Guests: &nbsp; 
+        <span style="font-size:1.2em;color:#3E2093;"> ${data['expectedNoOfGuests']}</span>
         </p>
       <p>
-            Event time: &nbsp; 
-        <span style="font-size:1.2em;color:#3E2093;">${data['time']}</span>
+            Event Start Date: &nbsp; 
+        <span style="font-size:1.2em;color:#3E2093;">${new Date(data['startDate']).toDateString()}</span>
         </p>
-      <h3 style="color:#3E2093">Special Requirements</h3>
-      <ul>
+      <p>
+            Event Start time: &nbsp; 
+        <span style="font-size:1.2em;color:#3E2093;">${data['startTime']}</span>
+        </p>
+        <p>
+        Event End Date: &nbsp; 
+    <span style="font-size:1.2em;color:#3E2093;">${new Date(data['endDate']).toDateString()}</span>
+    </p>
+  <p>
+        Event End time: &nbsp; 
+    <span style="font-size:1.2em;color:#3E2093;">${data['endTime']}</span>
+    </p>
+      
         ${specialReq}
-      </ul>
-      <h3 style="color:#3E2093">Extra Session/Message</h3>
-      <p >
-      ${data['message']}
-      </p>
+      ${extraSessions}
+      ${message}
     </body>
     </html>
     `;
